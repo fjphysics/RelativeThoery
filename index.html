@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>狭义相对论的同时相对性</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* SVG 小车样式 */
+    #carSvg {
+      position: absolute;
+      bottom: 50%;
+      left: 0;
+      width: 200px;
+      height: 50px;
+      animation-name: moveCar;
+      animation-duration: 5s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .light-source {
+      fill: #f1c40f;
+    }
+
+    .light-ray-left,
+    .light-ray-right {
+      position: absolute;
+      top: 50%;
+      height: 2px;
+      background-color: #e74c3c;
+      transform: translateY(-50%);
+      animation: shootLight 1s linear infinite;
+    }
+
+    .light-ray-left {
+      left: 50%;
+      width: 0;
+      animation-direction: normal;
+    }
+
+    .light-ray-right {
+      right: 50%;
+      width: 0;
+      animation-direction: reverse;
+    }
+
+    /* 初始动画关键帧，后续用 JS 动态修改 */
+    @keyframes moveCar {
+      0% {
+        left: -200px;
+      }
+
+      100% {
+        left: 100vw;
+      }
+    }
+
+    @keyframes shootLight {
+      0% {
+        width: 0;
+      }
+
+      100% {
+        width: 100px;
+      }
+    }
+
+    /* 滑动条样式 */
+    #rangeInput {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- 使用 SVG 绘制小车 -->
+    <svg id="carSvg" viewBox="0 0 200 50">
+      <!-- 车身 -->
+      <rect x="0" y="20" width="200" height="30" fill="#3498db" />
+      <!-- 车窗 -->
+      <rect x="20" y="25" width="40" height="20" fill="#ffffff" />
+      <rect x="140" y="25" width="40" height="20" fill="#ffffff" />
+      <!-- 光源 -->
+      <circle class="light-source" cx="100" cy="35" r="5" />
+    </svg>
+    <div class="light-ray-left"></div>
+    <div class="light-ray-right"></div>
+  </div>
+  <!-- 添加滑动条 -->
+  <input type="range" id="rangeInput" min="0" max="100" value="100">
+  <script>
+    const rangeInput = document.getElementById('rangeInput');
+    const carSvg = document.getElementById('carSvg');
+
+    rangeInput.addEventListener('input', function () {
+      const value = this.value;
+      const endPosition = `${value}vw`;
+      // 创建新的动画规则
+      const keyframes = `
+        @keyframes moveCar {
+          0% {
+            left: -200px;
+          }
+          100% {
+            left: ${endPosition};
+          }
+        }
+      `;
+      // 创建新的 style 元素并添加到 head 中
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      if (style.styleSheet) {
+        style.styleSheet.cssText = keyframes;
+      } else {
+        style.appendChild(document.createTextNode(keyframes));
+      }
+      // 移除旧的动画规则
+      const existingStyle = document.querySelector('style[data-custom-animation]');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      // 添加新的动画规则
+      style.setAttribute('data-custom-animation', '');
+      document.head.appendChild(style);
+    });
+  </script>
+</body>
+
+</html>
